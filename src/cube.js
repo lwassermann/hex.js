@@ -43,10 +43,10 @@ class _Cube {
 
 const Cube = R.curryN(2, function(q, r, s) { return new _Cube(q, r, s); });
 
-const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs})
-                             => Math.max(Math.abs(aq - bq),
-                                         Math.abs(ar - br),
-                                         Math.abs(az - bs)));
+const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
+                             Math.max(Math.abs(aq - bq),
+                                      Math.abs(ar - br),
+                                      Math.abs(az - bs)));
 
 const add = R.curry((a, b) => Cube(a.q + b.q, a.r + b.r));
 const sub = R.curry((a, b) => Cube(a.q - b.q, a.r - b.r));
@@ -104,7 +104,7 @@ const h = {
   scale,
   round,
   gridDistance,
-  length: gridDistance(Cube(0, 0, 0)),
+  len: gridDistance(Cube(0, 0, 0)),
 
   line,
   gridLine: R.curryN(2, R.compose(R.map(round), line)),
