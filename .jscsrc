@@ -1,3 +1,17 @@
 {
+  "preset": "airbnb",
 
+  "esnext": true,
+
+  "disallowTrailingComma": null,
+
+  "requireCurlyBraces": [
+    "if", "else",
+    "for", "while", "do",
+    "try", "catch"
+  ],
+
+  "requirePaddingNewLinesAfterBlocks": {
+    "allExcept": ["inCallExpressions", "inArrayExpressions", "inProperties"]
+  }
 }
