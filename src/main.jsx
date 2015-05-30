@@ -18,6 +18,13 @@ const Maybe = function(c) {
   return newMaybe;
 };
 
+function resize(canvas) {
+  const HDDPIPixelFactor = window.devicePixelRatio || 1;
+
+  canvas.width = canvas.clientWidth * HDDPIPixelFactor;
+  canvas.height = canvas.clientHeight * HDDPIPixelFactor;
+}
+
 const canvas = document.createElement('canvas');
 R.pipe(
        document.getElementById.bind(document),
@@ -26,4 +33,9 @@ R.pipe(
 )('content');
 
 const drawingContext = canvas.getContext('2d');
+resize(canvas);
 drawingContext.fillRect(50, 25, 150, 100);
+
+window.addEventListener('resize', function() {
+  resize(canvas);
+});
