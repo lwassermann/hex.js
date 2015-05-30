@@ -1,0 +1,26 @@
+{
+  "name": "hex.js",
+  "version": "0.0.1",
+  "main": "src/main.jsx",
+  "private": true,
+  "dependencies": {
+    "ramda": "*"
+  },
+  "devDependencies": {
+    "babelify": "~6.0.1"
+  },
+  "scripts": {
+    "build": "browserify src/main.jsx -o hex.js",
+    "watch": "watchify src/main.jsx -o hex.js --debug --verbose"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "sourceMaps": true
+        }
+      ]
+    ]
+  }
+}
