@@ -86,7 +86,7 @@ const line = (a, b) => {
 };
 
 // pointy top variant
-const fromPoint = R.curry(function(x, y) {
+const fromPoint = R.curry(function({x, y}) {
   const q = (x * Math.sqrt(3) / 3 - y / 3) / Cube.size;
   const r = y * 2 / 3 / Cube.size;
   return Cube(q, r);

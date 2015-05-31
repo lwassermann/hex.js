@@ -1,8 +1,8 @@
 'use strict';
 import R from 'ramda';
+const Rx = global.Rx;
 
 import {Cube} from './cube';
-import Functions from './functions';
 
 void Cube;
 
@@ -32,7 +32,7 @@ function updateSize(fn, canvas) {
     fn(canvas);
   }
 
-  global.Rx.Observable.fromEvent(window, 'resize').throttle(100).subscribe(resize);
+  Rx.Observable.fromEvent(window, 'resize').throttle(100).subscribe(resize);
   resize();
 }
 
@@ -44,20 +44,22 @@ function createCanvas(selector) {
   )(selector);
 }
 
-const drawCenter = R.curry(function drawCenter(canvas, evt) {
-  const hexMid = R.compose(Cube.toPoint,
-                           Cube.round,
-                           Cube.fromPoint)(evt.clientX * HDDPIPixelFactor,
-                                           evt.clientY * HDDPIPixelFactor);
+const drawPoint = R.curry(function(canvas, {x, y}) {
   const drawingContext = canvas.getContext('2d');
-  drawingContext.fillRect(hexMid.x - 5, hexMid.y - 5, 10, 10);
+  drawingContext.fillRect(x - 5, y - 5, 10, 10);
 });
 
 function initCanvas(canvas) {
   updateSize(canvas => {
     void canvas;
   }, canvas);
-  canvas.addEventListener('pointermove', drawCenter(canvas));
+  Rx.Observable.fromEvent(canvas, 'pointermove')
+    .map(e => {
+      return {x: e.clientX * HDDPIPixelFactor,
+              y: e.clientY * HDDPIPixelFactor};
+    })
+    .map(R.compose(Cube.toPoint, Cube.round, Cube.fromPoint))
+    .subscribe(drawPoint(canvas));
 }
 
 R.pipe(
