@@ -46,16 +46,19 @@ function createCanvas(selector) {
 }
 
 function initCanvas(canvas) {
+  const ctxt = canvas.getContext('2d');
+
   updateSize(canvas => {
     void canvas;
   }, canvas);
+
   Rx.Observable.fromEvent(canvas, 'pointermove')
     .map(e => {
       return {x: e.clientX * HDDPIPixelFactor,
               y: e.clientY * HDDPIPixelFactor};
     })
     .map(R.compose(Cube.round, Cube.fromPoint))
-    .subscribe(draw.cube(canvas.getContext('2d')));
+    .subscribe(draw.cube(ctxt));
 }
 
 R.pipe(

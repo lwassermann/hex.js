@@ -74,7 +74,7 @@ const round = R.curry(function(h) {
 const cubeCorner = R.curry(function({x, y}, i) {
   const angleDeg = 60 * i + 30;
   const angleRad = Math.PI / 180 * angleDeg;
-  const s = Cube.size - 2;
+  const s = Cube.size - Cube.spacing / 2;
   return {x: x + s * Math.cos(angleRad),
           y: y + s * Math.sin(angleRad)};
 });
@@ -125,7 +125,7 @@ const h = {
   toPoint,
 };
 
-extend(Cube, h, {fromPoint, size: 40});
+extend(Cube, h, {fromPoint, size: 40, spacing: 4});
 extend(_Cube.prototype, R.mapObj(applyToThis, h));
 
 export default Cube;
