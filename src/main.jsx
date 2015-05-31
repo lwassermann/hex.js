@@ -1,7 +1,8 @@
 'use strict';
+import R from 'ramda';
 
 import {Cube} from './cube';
-import R from 'ramda';
+import Functions from './functions';
 
 void Cube;
 
@@ -18,24 +19,49 @@ const Maybe = function(c) {
   return newMaybe;
 };
 
-function resize(canvas) {
-  const HDDPIPixelFactor = window.devicePixelRatio || 1;
+const HDDPIPixelFactor = window.devicePixelRatio || 1;
 
-  canvas.width = canvas.clientWidth * HDDPIPixelFactor;
-  canvas.height = canvas.clientHeight * HDDPIPixelFactor;
+function updateSize(fn, canvas) {
+  function resize() {
+    const width = canvas.clientWidth * HDDPIPixelFactor;
+    const height = canvas.clientHeight * HDDPIPixelFactor;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    fn(canvas);
+  }
+
+  window.addEventListener('resize', Functions.throttle(resize, 100));
+  resize();
 }
 
-const canvas = document.createElement('canvas');
-R.pipe(
-       document.getElementById.bind(document),
-       Maybe,
-       R.tap(R.map(element => element.appendChild(canvas)))
-)('content');
+function createCanvas(selector) {
+  return R.pipe(
+                document.getElementById.bind(document),
+                Maybe,
+                R.map(element => element.appendChild(document.createElement('canvas')))
+  )(selector);
+}
 
-const drawingContext = canvas.getContext('2d');
-resize(canvas);
-drawingContext.fillRect(50, 25, 150, 100);
-
-window.addEventListener('resize', function() {
-  resize(canvas);
+const drawCenter = R.curry(function drawCenter(canvas, evt) {
+  const hexMid = R.compose(Cube.toPoint,
+                           Cube.round,
+                           Cube.fromPoint)(evt.clientX * HDDPIPixelFactor,
+                                           evt.clientY * HDDPIPixelFactor);
+  const drawingContext = canvas.getContext('2d');
+  drawingContext.fillRect(hexMid.x - 5, hexMid.y - 5, 10, 10);
 });
+
+function initCanvas(canvas) {
+  updateSize(canvas => {
+    const drawingContext = canvas.getContext('2d');
+    drawingContext.fillRect(50, 25, 150, 100);
+  }, canvas);
+  canvas.addEventListener('pointermove', drawCenter(canvas));
+}
+
+R.pipe(
+       createCanvas,
+       R.map(initCanvas)
+       )('content');

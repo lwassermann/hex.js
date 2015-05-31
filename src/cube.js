@@ -86,15 +86,15 @@ const line = (a, b) => {
 };
 
 // pointy top variant
-const fromPoint = R.curry(function(size, x, y) {
-  const q = (x * Math.sqrt(3) / 3 - y / 3) / size;
-  const r = y * 2 / 3 / size;
+const fromPoint = R.curry(function(x, y) {
+  const q = (x * Math.sqrt(3) / 3 - y / 3) / Cube.size;
+  const r = y * 2 / 3 / Cube.size;
   return Cube(q, r);
 });
 
-const toPoint = R.curry(function(size, cube) {
-  const x = size * Math.sqrt(3) * (cube.q + cube.r / 2);
-  const y = size * 3 / 2 * cube.r;
+const toPoint = R.curry(function(cube) {
+  const x = Cube.size * Math.sqrt(3) * (cube.q + cube.r / 2);
+  const y = Cube.size * 3 / 2 * cube.r;
   return {x, y};
 });
 
@@ -111,7 +111,7 @@ const h = {
   directions,
 };
 
-extend(Cube, h, {fromPoint, toPoint});
+extend(Cube, h, {fromPoint, toPoint, size: 40});
 extend(_Cube.prototype, R.mapObj(applyToThis, h));
 
 export default Cube;
