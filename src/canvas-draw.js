@@ -1,7 +1,7 @@
 'use strict';
 
 import R from 'ramda';
-import Cube from './cube';
+import Hex from './hex';
 
 const beginPath = R.tap(function(ctxt) { ctxt.beginPath(); });
 const setProp = R.curry(function(name, value, obj) {
@@ -18,65 +18,66 @@ const drawPoint = R.curry(function(context, {x, y}) {
   return arguments[1];
 });
 
-const cubePath = function(context, cube) {
-  const vertices = Cube.corners(cube);
+const hexPath = function(context, hex) {
+  const vertices = Hex.corners(hex);
   context.moveTo(vertices[5].x, vertices[5].y);
   vertices.map(({x, y}) => context.lineTo(x, y));
 
   return arguments[1];
 };
 
-const drawCubeFill = R.curry(function(context, cube) {
-  cubePath(context, cube);
+const drawHexFill = R.curry(function(context, hex) {
+  hexPath(context, hex);
   context.fill();
 
   return arguments[1];
 });
 
-const drawCubeOutline = R.curry(function(context, cube) {
-  cubePath(context, cube);
+const drawHexOutline = R.curry(function(context, hex) {
+  hexPath(context, hex);
   context.stroke();
 
   return arguments[1];
 });
 
-const drawCubeCenter = R.curry(function(context, cube) {
-  drawPoint(context, cube.toPoint());
+const drawHexCenter = R.curry(function(context, hex) {
+  drawPoint(context, hex.toPoint());
 
   return arguments[1];
 });
 
-const drawCube = R.curry(function(context, cube) {
+const drawHex = R.curry(function(context, hex) {
   R.pipe(beginPath,
          fillStyle('#efefef'),
-         R.tap(drawCubeFill(R.__, cube)),
+         R.tap(drawHexFill(R.__, hex)),
          beginPath,
          strokeStyle('black'),
-         R.tap(drawCubeOutline(R.__, cube)),
+         R.tap(drawHexOutline(R.__, hex)),
          beginPath,
          fillStyle('white'),
-         R.tap(drawCubeCenter(R.__, cube))
+         R.tap(drawHexCenter(R.__, hex))
          )(context);
-  return cube;
+  return hex;
 });
 
-const flush = function(context) {
-  context.save();
-  context.filLStyle = 'white';
-  context.fillRect(0, 0, context.width, context.height);
-  context.restore();
+const flush = function flush(context) {
+  const tapFlush = function(hex) {
+    context.fillStyle = 'white';
 
-  return context;
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    return hex;
+  };
+  return tapFlush(tapFlush);
 };
 
 export default {
-  cube: drawCube,
-  cubeCenter: drawCubeCenter,
-  fillCube: drawCubeFill,
-  outlineCube: drawCubeOutline,
+  hex: drawHex,
+  hexCenter: drawHexCenter,
+  fillHex: drawHexFill,
+  outlineHex: drawHexOutline,
 
   flush,
 
   point: drawPoint,
 };
-export {drawPoint, drawCubeCenter, drawCube, drawCubeOutline, flush};
+export {drawPoint, drawHexCenter, drawHex, drawHexOutline, flush};

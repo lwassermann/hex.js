@@ -29,7 +29,7 @@ const applyToThis = fn => R.curryN(fn.length - 1, function() {
   return fn.call(this, this, ...arguments);
 });
 
-class _Cube {
+class _Hex {
   constructor(q, r, s) {
     this.q = q;
     this.r = r;
@@ -41,16 +41,16 @@ class _Cube {
   }
 }
 
-const Cube = R.curryN(2, function(q, r, s) { return new _Cube(q, r, s); });
+const Hex = R.curryN(2, function(q, r, s) { return new _Hex(q, r, s); });
 
 const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
                              Math.max(Math.abs(aq - bq),
                                       Math.abs(ar - br),
                                       Math.abs(az - bs)));
 
-const add = R.curry((a, b) => Cube(a.q + b.q, a.r + b.r));
-const sub = R.curry((a, b) => Cube(a.q - b.q, a.r - b.r));
-const scale = R.curry((a, k) => Cube(a.q * k, a.r * k));
+const add = R.curry((a, b) => Hex(a.q + b.q, a.r + b.r));
+const sub = R.curry((a, b) => Hex(a.q - b.q, a.r - b.r));
+const scale = R.curry((a, k) => Hex(a.q * k, a.r * k));
 
 const round = R.curry(function(h) {
   // rX means rounded X, short for glanceability (otherwise the rounded dominates the word)
@@ -63,48 +63,48 @@ const round = R.curry(function(h) {
   const dS = Math.abs(rS - h.s);
 
   if (dQ > dR && dQ > dS) {
-    return Cube(-rR - rS, rR, rS);
+    return Hex(-rR - rS, rR, rS);
   } else if (dR > dS) {
-    return Cube(rQ, -rQ - rS, rS);
+    return Hex(rQ, -rQ - rS, rS);
   }
 
-  return Cube(rQ, rR, -rQ - rR);
+  return Hex(rQ, rR, -rQ - rR);
 });
 
-const cubeCorner = R.curry(function({x, y}, i) {
+const hexCorner = R.curry(function({x, y}, i) {
   const angleDeg = 60 * i + 30;
   const angleRad = Math.PI / 180 * angleDeg;
-  const s = Cube.size - Cube.spacing / 2;
+  const s = Hex.size - Hex.spacing / 2;
   return {x: x + s * Math.cos(angleRad),
           y: y + s * Math.sin(angleRad)};
 });
 
-const corners = cube => R.range(0, 6).map(cubeCorner(cube.toPoint()));
+const corners = hex => R.range(0, 6).map(hexCorner(hex.toPoint()));
 
 const directions = [
-  Cube(+1, -1, 0), Cube(+1, 0, -1), Cube(0, +1, -1),
-  Cube(-1, +1, 0), Cube(-1, 0, +1), Cube(0, -1, +1)
+  Hex(+1, -1, 0), Hex(+1, 0, -1), Hex(0, +1, -1),
+  Hex(-1, +1, 0), Hex(-1, 0, +1), Hex(0, -1, +1)
 ];
 
 const line = (a, b) => {
   const {q: dq, r: dr} = sub(b, a);
   const N = gridDistance(a, b);
   const dN = 1.0 / N;
-  return R.map(i => Cube(a.q + dq * dN * i,
+  return R.map(i => Hex(a.q + dq * dN * i,
                          a.r + dr * dN * i),
                R.range(0, N + 1));
 };
 
 // pointy top variant
 const fromPoint = R.curry(function({x, y}) {
-  const q = (x * Math.sqrt(3) / 3 - y / 3) / Cube.size;
-  const r = y * 2 / 3 / Cube.size;
-  return Cube(q, r);
+  const q = (x * Math.sqrt(3) / 3 - y / 3) / Hex.size;
+  const r = y * 2 / 3 / Hex.size;
+  return Hex(q, r);
 });
 
-const toPoint = R.curry(function(cube) {
-  const x = Cube.size * Math.sqrt(3) * (cube.q + cube.r / 2);
-  const y = Cube.size * 3 / 2 * cube.r;
+const toPoint = R.curry(function(hex) {
+  const x = Hex.size * Math.sqrt(3) * (hex.q + hex.r / 2);
+  const y = Hex.size * 3 / 2 * hex.r;
   return {x, y};
 });
 
@@ -114,7 +114,7 @@ const h = {
   scale,
   round,
   gridDistance,
-  len: gridDistance(Cube(0, 0, 0)),
+  len: gridDistance(Hex(0, 0, 0)),
 
   line,
   gridLine: R.curryN(2, R.compose(R.map(round), line)),
@@ -125,8 +125,8 @@ const h = {
   toPoint,
 };
 
-extend(Cube, h, {fromPoint, size: 40, spacing: 4});
-extend(_Cube.prototype, R.mapObj(applyToThis, h));
+extend(Hex, h, {fromPoint, size: 40, spacing: 4});
+extend(_Hex.prototype, R.mapObj(applyToThis, h));
 
-export default Cube;
-export {Cube};
+export default Hex;
+export {Hex};

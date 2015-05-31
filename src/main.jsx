@@ -2,10 +2,10 @@
 import R from 'ramda';
 const Rx = global.Rx;
 
-import {Cube} from './cube';
+import {Hex} from './hex';
 import draw from './canvas-draw';
 
-void Cube;
+void Hex;
 
 const MaybeProto = {map: R.curry(function(fn) {
     if (!R.isNil(this.value)) { return Maybe(fn(this.value)); }
@@ -57,8 +57,8 @@ function initCanvas(canvas) {
       return {x: e.clientX * HDDPIPixelFactor,
               y: e.clientY * HDDPIPixelFactor};
     })
-    .map(R.compose(Cube.round, Cube.fromPoint))
-    .subscribe(draw.cube(ctxt));
+    .map(R.compose(Hex.round, Hex.fromPoint))
+    .subscribe(R.compose(draw.hex(ctxt), draw.flush(ctxt)));
 }
 
 R.pipe(
