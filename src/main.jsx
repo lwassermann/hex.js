@@ -55,7 +55,7 @@ function initCanvas(canvas) {
               y: e.clientY * HDDPIPixelFactor};
     })
     .map(R.compose(Cube.round, Cube.fromPoint))
-    .subscribe(draw.cubeOutline(canvas.getContext('2d')));
+    .subscribe(draw.cube(canvas.getContext('2d')));
 }
 
 R.pipe(

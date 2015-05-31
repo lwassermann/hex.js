@@ -7,18 +7,21 @@ const drawPoint = R.curry(function(context, {x, y}) {
   context.fillRect(x - 5, y - 5, 10, 10);
 });
 
+const cubeOutline = function(context, cube) {
+  const vertices = Cube.corners(cube);
+  context.moveTo(vertices[5].x, vertices[5].y);
+  vertices.map(({x, y}) => context.lineTo(x, y));
+};
+
 const drawCube = R.curry(function(context, cube) {
-  const {x, y} = cube.toPoint();
-  context.fillRect(x - 5, y - 5, 10, 10);
+  context.beginPath();
+  cubeOutline(context, cube);
+  context.fill();
 });
 
 const drawCubeOutline = R.curry(function(context, cube) {
   context.beginPath();
-
-  const vertices = Cube.corners(cube);
-  context.moveTo(vertices[5].x, vertices[5].y);
-  vertices.map(({x, y}) => context.lineTo(x, y));
-
+  cubeOutline(context, cube);
   context.stroke();
 });
 

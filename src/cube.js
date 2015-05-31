@@ -74,8 +74,9 @@ const round = R.curry(function(h) {
 const cubeCorner = R.curry(function({x, y}, i) {
   const angleDeg = 60 * i + 30;
   const angleRad = Math.PI / 180 * angleDeg;
-  return {x: x + Cube.size * Math.cos(angleRad),
-          y: y + Cube.size * Math.sin(angleRad)};
+  const s = Cube.size - 2;
+  return {x: x + s * Math.cos(angleRad),
+          y: y + s * Math.sin(angleRad)};
 });
 
 const corners = cube => R.range(0, 6).map(cubeCorner(cube.toPoint()));
