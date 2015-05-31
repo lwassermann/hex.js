@@ -6,7 +6,7 @@ const extend = function(destination, ...sources) {
   sources.forEach(source => {
     for (let property in source) {
       if (destination === window && window.hasOwnProperty(property)) {
-        console.warn('window already has a property "' + property + '". If needed, it should be '
+        global.console.warn('window already has a property "' + property + '". If needed, it should be '
                      + 'set directly and explicitly, not through the use of extend()');
       }
 
@@ -71,6 +71,15 @@ const round = R.curry(function(h) {
   return Cube(rQ, rR, -rQ - rR);
 });
 
+const cubeCorner = R.curry(function({x, y}, i) {
+  const angleDeg = 60 * i + 30;
+  const angleRad = Math.PI / 180 * angleDeg;
+  return {x: x + Cube.size * Math.cos(angleRad),
+          y: y + Cube.size * Math.sin(angleRad)};
+});
+
+const corners = cube => R.range(0, 6).map(cubeCorner(cube.toPoint()));
+
 const directions = [
   Cube(+1, -1, 0), Cube(+1, 0, -1), Cube(0, +1, -1),
   Cube(-1, +1, 0), Cube(-1, 0, +1), Cube(0, -1, +1)
@@ -108,10 +117,14 @@ const h = {
 
   line,
   gridLine: R.curryN(2, R.compose(R.map(round), line)),
+
+  corners,
   directions,
+
+  toPoint,
 };
 
-extend(Cube, h, {fromPoint, toPoint, size: 40});
+extend(Cube, h, {fromPoint, size: 40});
 extend(_Cube.prototype, R.mapObj(applyToThis, h));
 
 export default Cube;

@@ -3,7 +3,7 @@ import R from 'ramda';
 const Rx = global.Rx;
 
 import {Cube} from './cube';
-import {drawCube} from './canvas-draw';
+import draw from './canvas-draw';
 
 void Cube;
 
@@ -55,7 +55,7 @@ function initCanvas(canvas) {
               y: e.clientY * HDDPIPixelFactor};
     })
     .map(R.compose(Cube.round, Cube.fromPoint))
-    .subscribe(drawCube(canvas));
+    .subscribe(draw.cubeOutline(canvas.getContext('2d')));
 }
 
 R.pipe(
