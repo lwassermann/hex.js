@@ -32,7 +32,7 @@ function updateSize(fn, canvas) {
     fn(canvas);
   }
 
-  window.addEventListener('resize', Functions.throttle(resize, 100));
+  global.Rx.Observable.fromEvent(window, 'resize').throttle(100).subscribe(resize);
   resize();
 }
 
