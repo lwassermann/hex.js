@@ -3,6 +3,7 @@ import R from 'ramda';
 const Rx = global.Rx;
 
 import {Cube} from './cube';
+import {drawCube} from './canvas-draw';
 
 void Cube;
 
@@ -44,11 +45,6 @@ function createCanvas(selector) {
   )(selector);
 }
 
-const drawPoint = R.curry(function(canvas, {x, y}) {
-  const drawingContext = canvas.getContext('2d');
-  drawingContext.fillRect(x - 5, y - 5, 10, 10);
-});
-
 function initCanvas(canvas) {
   updateSize(canvas => {
     void canvas;
@@ -58,8 +54,8 @@ function initCanvas(canvas) {
       return {x: e.clientX * HDDPIPixelFactor,
               y: e.clientY * HDDPIPixelFactor};
     })
-    .map(R.compose(Cube.toPoint, Cube.round, Cube.fromPoint))
-    .subscribe(drawPoint(canvas));
+    .map(R.compose(Cube.round, Cube.fromPoint))
+    .subscribe(drawCube(canvas));
 }
 
 R.pipe(
