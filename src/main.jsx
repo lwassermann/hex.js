@@ -54,8 +54,8 @@ function initCanvas(canvas) {
 
   Rx.Observable.fromEvent(canvas, 'pointermove')
     .map(e => {
-      return {x: e.clientX * HDDPIPixelFactor,
-              y: e.clientY * HDDPIPixelFactor};
+      return {x: (window.scrollX + e.clientX) * HDDPIPixelFactor,
+              y: (window.scrollY + e.clientY) * HDDPIPixelFactor};
     })
     .map(R.compose(Hex.round, Hex.fromPoint))
     .subscribe(R.compose(draw.hex(ctxt), draw.flush(ctxt)));
