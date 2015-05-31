@@ -55,8 +55,7 @@ const drawCenter = R.curry(function drawCenter(canvas, evt) {
 
 function initCanvas(canvas) {
   updateSize(canvas => {
-    const drawingContext = canvas.getContext('2d');
-    drawingContext.fillRect(50, 25, 150, 100);
+    void canvas;
   }, canvas);
   canvas.addEventListener('pointermove', drawCenter(canvas));
 }
