@@ -20,9 +20,9 @@ const Maybe = function(c) {
   return newMaybe;
 };
 
-const HDDPIPixelFactor = window.devicePixelRatio || 1;
-
 function updateSize(fn, canvas) {
+  const HDDPIPixelFactor = window && window.devicePixelRatio || 1;
+
   function resize() {
     const width = canvas.clientWidth * HDDPIPixelFactor;
     const height = canvas.clientHeight * HDDPIPixelFactor;
@@ -54,8 +54,8 @@ function initCanvas(canvas) {
 
   Rx.Observable.fromEvent(canvas, 'pointermove')
     .map(e => {
-      return {x: (window.scrollX + e.clientX) * HDDPIPixelFactor,
-              y: (window.scrollY + e.clientY) * HDDPIPixelFactor};
+      return {x: (window.scrollX + e.clientX),
+              y: (window.scrollY + e.clientY)};
     })
     .map(R.compose(Hex.round, Hex.fromPoint))
     .subscribe(R.compose(draw.hex(ctxt), draw.flush(ctxt)));

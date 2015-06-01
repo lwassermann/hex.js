@@ -3,6 +3,8 @@
 import R from 'ramda';
 import Hex from './hex';
 
+const pixelFactor = window && window.devicePixelRatio || 1;
+
 const beginPath = R.tap(function(ctxt) { ctxt.beginPath(); });
 const setProp = R.curry(function(name, value, obj) {
   obj[name] = value;
@@ -12,7 +14,7 @@ const fillStyle = setProp('fillStyle');
 const strokeStyle = setProp('strokeStyle');
 
 const drawPoint = R.curry(function(context, {x, y}) {
-  context.arc(x, y, 5, 0, 2 * Math.PI);
+  context.arc(x * pixelFactor, y * pixelFactor, 2 * pixelFactor, 0, 2 * Math.PI);
   context.fill();
 
   return arguments[1];
@@ -20,8 +22,8 @@ const drawPoint = R.curry(function(context, {x, y}) {
 
 const hexPath = function(context, hex) {
   const vertices = Hex.corners(hex);
-  context.moveTo(vertices[5].x, vertices[5].y);
-  vertices.map(({x, y}) => context.lineTo(x, y));
+  context.moveTo(vertices[5].x * pixelFactor, vertices[5].y * pixelFactor);
+  vertices.map(({x, y}) => context.lineTo(x * pixelFactor, y * pixelFactor));
 
   return arguments[1];
 };

@@ -125,7 +125,7 @@ const h = {
   toPoint,
 };
 
-extend(Hex, h, {fromPoint, size: 40, spacing: 4});
+extend(Hex, h, {fromPoint, size: 20, spacing: 2});
 extend(_Hex.prototype, R.mapObj(applyToThis, h));
 
 export default Hex;
