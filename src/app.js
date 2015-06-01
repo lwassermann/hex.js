@@ -7,6 +7,35 @@ import {Hex} from './hex';
 
 const applicationState = [];
 
+// --------------------------------------------------------------------------------------------------------
+
+const redraw = R.curry(function(ctxt) {
+  draw.flush(ctxt);
+  let content = applicationState[ctxt.canvas.id];
+  content.map(draw.hex(ctxt));
+});
+
+const targetHex = R.curry(function(ctxt, hex) {
+  redraw(ctxt);
+  draw.hex(ctxt, hex);
+});
+
+const toggleHex = R.curry(function(id, hex) {
+  const hexes = applicationState[id];
+  if (R.find(R.invoke('equals', [hex]), hexes)) {
+    applicationState[id] = R.reject(R.invoke('equals', [hex]), hexes);
+  } else {
+    applicationState[id].push(hex);
+  }
+});
+
+// --------------------------------------------------------------------------------------------------------
+
+const relativePtFromEvt = function(e) {
+  return {x: (window.scrollX + e.clientX),
+          y: (window.scrollY + e.clientY)};
+};
+
 function updateSize(fn, canvas) {
   const HDDPIPixelFactor = window && window.devicePixelRatio || 1;
 
@@ -24,31 +53,6 @@ function updateSize(fn, canvas) {
   resize();
 }
 
-const redraw = R.curry(function(ctxt) {
-  draw.flush(ctxt);
-  let content = applicationState[ctxt.canvas.id];
-  content.map(draw.hex(ctxt));
-});
-
-const targetHex = R.curry(function(ctxt, hex) {
-  redraw(ctxt);
-  draw.hex(ctxt, hex);
-});
-
-const relativePtFromEvt = function(e) {
-  return {x: (window.scrollX + e.clientX),
-          y: (window.scrollY + e.clientY)};
-};
-
-const toggleHex = R.curry(function(id, hex) {
-  const hexes = applicationState[id];
-  if (R.find(R.invoke('equals', [hex]), hexes)) {
-    applicationState[id] = R.reject(R.invoke('equals', [hex]), hexes);
-  } else {
-    applicationState[id].push(hex);
-  }
-});
-
 function initCanvas(canvas) {
   const ctxt = canvas.getContext('2d');
   if (!canvas.id) { canvas.id = 1; }
@@ -65,6 +69,8 @@ function initCanvas(canvas) {
     .map(R.compose(Hex.round, Hex.fromPoint, relativePtFromEvt))
     .subscribe(R.compose(redraw, R.always(ctxt), toggleHex(canvas.id)));
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 const app = {
   initCanvas,
