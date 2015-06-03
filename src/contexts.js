@@ -1,6 +1,7 @@
 import R from 'ramda';
 
-const MaybeProto = {map: R.curry(function(fn) {
+const MaybeProto = {
+  map: R.curry(function(fn) {
     if (!R.isNil(this.value)) { return Maybe(fn(this.value)); }
 
     return this;
