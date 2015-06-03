@@ -9,10 +9,6 @@ class _Hex {
     this.r = r;
     this.s = R.defaultTo(-q - r, s);
   }
-
-  equals({q, r, s}) {
-    return this.q === q && this.r === r && this.s === s;
-  }
 }
 
 const Hex = R.curryN(2, function(q, r, s) { return new _Hex(q, r, s); });
@@ -25,6 +21,10 @@ const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
 const add = R.curry((a, b) => Hex(a.q + b.q, a.r + b.r));
 const sub = R.curry((a, b) => Hex(a.q - b.q, a.r - b.r));
 const scale = R.curry((a, k) => Hex(a.q * k, a.r * k));
+
+const equals = R.curry(function({q: q1, r: r1, s: s1}, {q: q2, r: r2, s: s2}) {
+  return q1 === q2 && r1 === r2 && s1 === s2;
+});
 
 const round = R.curry(function(h) {
   // rX means rounded X, short for glanceability (otherwise the rounded dominates the word)
@@ -87,6 +87,7 @@ const h = {
   sub,
   scale,
   round,
+  equals,
   gridDistance,
   len: gridDistance(Hex(0, 0, 0)),
 

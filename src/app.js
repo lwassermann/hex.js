@@ -37,8 +37,8 @@ function updateSize(fn, canvas) {
 class _App {
   constructor(canvas) {
     this.context = canvas.getContext('2d');
-    this.selectedHexes = [];
-    this.objects = [Hex(3, 4)];
+    this.scene = [];
+    this.objects = [{hex: Hex(3, 4), colors: {background: 'green'}}];
 
     this.render(canvas);
   }
@@ -52,8 +52,8 @@ const App = function(canvas) {
 
 function redraw(app) {
   draw.flush(app.context);
-  app.selectedHexes.map(draw.defaultHex(app.context));
-  app.objects.map(draw.defaultHex(app.context));
+  app.scene.map(draw.defaultHex(app.context));
+  app.objects.map(spec => draw.hex(app.context, spec.colors, spec.hex));
 }
 
 const targetHex = R.curry(function(app, hex) {
@@ -62,35 +62,53 @@ const targetHex = R.curry(function(app, hex) {
 });
 
 const toggleHex = R.curry(function(app, hex) {
-  const hexes = app.selectedHexes;
+  const hexes = app.scene;
   if (R.find(R.invoke('equals', [hex]), hexes)) {
-    app.selectedHexes = R.reject(R.invoke('equals', [hex]), hexes);
+    app.scene = R.reject(R.invoke('equals', [hex]), hexes);
   } else {
-    app.selectedHexes.push(hex);
+    app.scene.push(hex);
   }
 
   return hex;
 });
 
-const handlePointerMove = R.curry(function(app, hex) {
-  void hex;
-  app.redraw();
-  app.targetHex(hex);
+const handlePointerMove = R.curry(function(app, pt) {
+  if (app.moves) {
+    app.moves.hex = Hex.fromPoint(pt);
+    app.redraw();
+  }
 });
 const handlePointerDown = R.curry(function(app, hex) {
-  void hex;
-  app.toggleHex(hex);
+  let targetObject = R.find(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
+  if (targetObject) {
+    app.moves = targetObject;
+    targetObject.from = hex;
+  } else {
+    app.toggleHex(hex);
+  }
+
   app.redraw();
 });
 const handlePointerUp = R.curry(function(app, hex) {
-  void hex;
+  if (app.moves) {
+    if (R.any(Hex.equals(hex), app.objects)) {
+      app.moves.hex = app.moves.from;
+    } else {
+      app.moves.hex = hex;
+    }
+
+    delete app.moves.from;
+    delete app.moves;
+  }
+
+  redraw(app);
 });
 
 function render(app, canvas) {
   updateSize(app.redraw.bind(app), canvas);
 
   Rx.Observable.fromEvent(canvas, 'pointermove')
-    .map(relativeHexFromEvt)
+    .map(relativePtFromEvt)
     .subscribe(handlePointerMove(app));
 
   Rx.Observable.fromEvent(canvas, 'pointerdown')
