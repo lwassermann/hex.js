@@ -52,12 +52,12 @@ const App = function(canvas) {
 
 function redraw(app) {
   draw.flush(app.context);
-  app.selectedHexes.map(draw.hex(app.context));
-  app.objects.map(draw.hex(app.context));
+  app.selectedHexes.map(draw.defaultHex(app.context));
+  app.objects.map(draw.defaultHex(app.context));
 }
 
 const targetHex = R.curry(function(app, hex) {
-  draw.hex(app.context, hex);
+  draw.defaultHex(app.context, hex);
   return hex;
 });
 

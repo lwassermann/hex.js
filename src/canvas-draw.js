@@ -48,17 +48,25 @@ const drawHexCenter = R.curry(function(context, hex) {
   return arguments[1];
 });
 
-const drawHex = R.curry(function(context, hex) {
-  R.pipe(beginPath,
-         fillStyle('#efefef'),
-         R.tap(drawHexFill(R.__, hex)),
-         beginPath,
-         strokeStyle('black'),
-         R.tap(drawHexOutline(R.__, hex)),
-         beginPath,
-         fillStyle('white'),
-         R.tap(drawHexCenter(R.__, hex))
-         )(context);
+const drawHex = R.curry(function(context, options, hex) {
+  if (R.has('background', options)) {
+    beginPath(context);
+    fillStyle(options.background, context);
+    drawHexFill(context, hex);
+  }
+
+  if (R.has('outline', options)) {
+    beginPath(context);
+    strokeStyle(options.outline, context);
+    drawHexOutline(context, hex);
+  }
+
+  if (R.has('center', options)) {
+    beginPath(context);
+    fillStyle(options.center, context);
+    drawHexCenter(context, hex);
+  }
+
   return hex;
 });
 
@@ -74,6 +82,7 @@ const flush = function flush(context) {
 
 export default {
   hex: drawHex,
+  defaultHex: drawHex(R.__, {background: '#efefef', outline: '#333333'}),
   hexCenter: drawHexCenter,
   fillHex: drawHexFill,
   outlineHex: drawHexOutline,
