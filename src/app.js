@@ -1,33 +1,10 @@
 import R from 'ramda';
+import {extend, applyToThis} from './util';
 
 const Rx = global.Rx;
 
 import draw from './canvas-draw';
 import {Hex} from './hex';
-
-const applicationState = [];
-
-// --------------------------------------------------------------------------------------------------------
-
-const redraw = R.curry(function(ctxt) {
-  draw.flush(ctxt);
-  let content = applicationState[ctxt.canvas.id];
-  content.map(draw.hex(ctxt));
-});
-
-const targetHex = R.curry(function(ctxt, hex) {
-  redraw(ctxt);
-  draw.hex(ctxt, hex);
-});
-
-const toggleHex = R.curry(function(id, hex) {
-  const hexes = applicationState[id];
-  if (R.find(R.invoke('equals', [hex]), hexes)) {
-    applicationState[id] = R.reject(R.invoke('equals', [hex]), hexes);
-  } else {
-    applicationState[id].push(hex);
-  }
-});
 
 // --------------------------------------------------------------------------------------------------------
 
@@ -35,6 +12,8 @@ const relativePtFromEvt = function(e) {
   return {x: (window.scrollX + e.clientX),
           y: (window.scrollY + e.clientY)};
 };
+
+const relativeHexFromEvt = R.compose(Hex.round, Hex.fromPoint, relativePtFromEvt);
 
 function updateSize(fn, canvas) {
   const HDDPIPixelFactor = window && window.devicePixelRatio || 1;
@@ -53,28 +32,68 @@ function updateSize(fn, canvas) {
   resize();
 }
 
-function initCanvas(canvas) {
-  const ctxt = canvas.getContext('2d');
-  if (!canvas.id) { canvas.id = 1; }
+// --------------------------------------------------------------------------------------------------------
 
-  applicationState[canvas.id] = [];
+class _App {
+  constructor(canvas) {
+    this.selectedHexes = [];
+    this.context = canvas.getContext('2d');
 
-  updateSize(R.compose(redraw, R.invoke('getContext', ['2d'])), canvas);
-
-  Rx.Observable.fromEvent(canvas, 'pointermove')
-    .map(R.compose(Hex.round, Hex.fromPoint, relativePtFromEvt))
-    .subscribe(targetHex(ctxt));
-
-  Rx.Observable.fromEvent(canvas, 'pointerdown')
-    .map(R.compose(Hex.round, Hex.fromPoint, relativePtFromEvt))
-    .subscribe(R.compose(redraw, R.always(ctxt), toggleHex(canvas.id)));
+    this.render(canvas);
+  }
 }
 
 // --------------------------------------------------------------------------------------------------------
 
-const app = {
-  initCanvas,
+const App = function(canvas) {
+  return new _App(canvas);
 };
 
-export default app;
-export {initCanvas};
+function redraw(app) {
+  draw.flush(app.context);
+  app.selectedHexes.map(draw.hex(app.context));
+}
+
+const targetHex = R.curry(function(app, hex) {
+  app.redraw();
+  draw.hex(app.context, hex);
+  return hex;
+});
+
+const toggleHex = R.curry(function(app, hex) {
+  const hexes = app.selectedHexes;
+  if (R.find(R.invoke('equals', [hex]), hexes)) {
+    app.selectedHexes = R.reject(R.invoke('equals', [hex]), hexes);
+  } else {
+    app.selectedHexes.push(hex);
+  }
+
+  return hex;
+});
+
+function render(app, canvas) {
+  updateSize(app.redraw.bind(app), canvas);
+
+  Rx.Observable.fromEvent(canvas, 'pointermove')
+    .map(relativeHexFromEvt)
+    .subscribe(targetHex(app));
+
+  Rx.Observable.fromEvent(canvas, 'pointerdown')
+    .map(relativeHexFromEvt)
+    .subscribe(R.compose(app.redraw.bind(app), toggleHex(app)));
+  return canvas;
+}
+
+// --------------------------------------------------------------------------------------------------------
+
+const behaviour = {
+  render,
+  targetHex,
+  redraw,
+  toggleHex,
+};
+extend(App, behaviour);
+extend(_App.prototype, R.mapObj(applyToThis, behaviour));
+
+export default App;
+export {render};

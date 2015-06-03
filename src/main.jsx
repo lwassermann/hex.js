@@ -14,5 +14,5 @@ function createCanvas(selector) {
 
 R.pipe(
        createCanvas,
-       R.map(app.initCanvas)
+       R.map(app)
        )('content');
