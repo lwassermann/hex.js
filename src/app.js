@@ -38,7 +38,10 @@ class _App {
   constructor(canvas) {
     this.context = canvas.getContext('2d');
     this.scene = [];
-    this.objects = [{hex: Hex(3, 4), colors: {background: 'green'}}];
+    this.objects = [
+      {hex: Hex(3, 3), colors: {background: 'red'}},
+      {hex: Hex(3, 4), colors: {background: 'green'}},
+      {hex: Hex(3, 5), colors: {background: 'blue'}}];
 
     this.render(canvas);
   }
@@ -79,10 +82,11 @@ const handlePointerMove = R.curry(function(app, pt) {
   }
 });
 const handlePointerDown = R.curry(function(app, hex) {
-  let targetObject = R.find(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
+  let targetObject = R.findLast(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
   if (targetObject) {
     app.moves = targetObject;
     targetObject.from = hex;
+    app.objects.sort((a, b) => a === targetObject ? 1 : b === targetObject ? -1 : 0);
   } else {
     app.toggleHex(hex);
   }
@@ -91,7 +95,7 @@ const handlePointerDown = R.curry(function(app, hex) {
 });
 const handlePointerUp = R.curry(function(app, hex) {
   if (app.moves) {
-    if (R.any(Hex.equals(hex), app.objects)) {
+    if (R.any(R.compose(Hex.equals(hex), R.prop('hex')), app.objects)) {
       app.moves.hex = app.moves.from;
     } else {
       app.moves.hex = hex;

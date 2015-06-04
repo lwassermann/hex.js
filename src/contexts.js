@@ -1,11 +1,5 @@
 import R from 'ramda';
 
-const MaybeProto = {
-  map: R.curry(function(fn) {
-    return Maybe(fn(this.value));
-  })
-};
-
 const Nothing = {};
 Nothing.map = R.always(Nothing);
 
@@ -15,6 +9,12 @@ const Maybe = function(c) {
   const newMaybe = Object.create(MaybeProto);
   newMaybe.value = c;
   return newMaybe;
+};
+
+const MaybeProto = {
+  map: R.curry(function(fn) {
+    return Maybe(fn(this.value));
+  })
 };
 
 export default {};
