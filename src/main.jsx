@@ -17,4 +17,3 @@ R.pipe(
        R.map(app)
        )('content');
 
-import sync from './sync';
