@@ -22,9 +22,11 @@ const add = R.curry((a, b) => Hex(a.q + b.q, a.r + b.r));
 const sub = R.curry((a, b) => Hex(a.q - b.q, a.r - b.r));
 const scale = R.curry((a, k) => Hex(a.q * k, a.r * k));
 
+/* eslint-disable no-dupe-args */
 const equals = R.curry(function({q: q1, r: r1, s: s1}, {q: q2, r: r2, s: s2}) {
   return q1 === q2 && r1 === r2 && s1 === s2;
 });
+/* eslint-enable no-dupe-args */
 
 const round = R.curry(function(h) {
   // rX means rounded X, short for glanceability (otherwise the rounded dominates the word)

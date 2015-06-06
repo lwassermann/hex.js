@@ -16,3 +16,5 @@ R.pipe(
        createCanvas,
        R.map(app)
        )('content');
+
+import sync from './sync';
