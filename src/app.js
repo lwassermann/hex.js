@@ -40,11 +40,14 @@ class _App {
     this.context = canvas.getContext('2d');
     this.scene = [];
     this.objects = [
-      {hex: Hex(3, 3), colors: {background: 'red'}},
-      {hex: Hex(3, 4), colors: {background: 'green'}},
-      {hex: Hex(3, 5), colors: {background: 'blue'}}];
+      {hex: Hex(3, 3), colors: {background: 'red'}, id: 1},
+      {hex: Hex(3, 4), colors: {background: 'green'}, id: 2},
+      {hex: Hex(2, 5), colors: {background: 'blue'}, id: 3}];
 
     this.render(canvas);
+
+    this.sync = synchronize('hex');
+    this.sync.stream.subscribe(handleRemoteUpdate(this));
   }
 }
 
@@ -67,8 +70,8 @@ const targetHex = R.curry(function(app, hex) {
 
 const toggleHex = R.curry(function(app, hex) {
   const hexes = app.scene;
-  if (R.find(R.invoke('equals', [hex]), hexes)) {
-    app.scene = R.reject(R.invoke('equals', [hex]), hexes);
+  if (R.find(Hex.equals(hex), hexes)) {
+    app.scene = R.reject(Hex.equals(hex), hexes);
   } else {
     app.scene.push(hex);
   }
@@ -109,6 +112,18 @@ const handlePointerUp = R.curry(function(app, hex) {
   redraw(app);
 });
 
+const handleRemoteUpdate = R.curry(function(app, data) {
+  extend(app, data);
+  redraw(app);
+});
+
+const sync = function(app) {
+  return () => {
+    extend(app.sync.client.getData(), R.pick(['scene', 'objects'], app));
+    app.sync.sync();
+  };
+};
+
 function render(app, canvas) {
   updateSize(app.redraw.bind(app), canvas);
 
@@ -116,13 +131,15 @@ function render(app, canvas) {
     .map(relativePtFromEvt)
     .subscribe(handlePointerMove(app));
 
-  Rx.Observable.fromEvent(canvas, 'pointerdown')
-    .map(relativeHexFromEvt)
-    .subscribe(handlePointerDown(app));
+  const pointerdown = Rx.Observable.fromEvent(canvas, 'pointerdown')
+    .map(relativeHexFromEvt);
+  pointerdown.subscribe(handlePointerDown(app));
+  pointerdown.subscribe(sync(app));
 
-  Rx.Observable.fromEvent(canvas, 'pointerup')
-    .map(relativeHexFromEvt)
-    .subscribe(handlePointerUp(app));
+  const pointerup = Rx.Observable.fromEvent(canvas, 'pointerup')
+    .map(relativeHexFromEvt);
+  pointerup.subscribe(handlePointerUp(app));
+  pointerup.subscribe(sync(app));
 
   return canvas;
 }

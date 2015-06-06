@@ -11,7 +11,7 @@ class _Hex {
   }
 }
 
-const Hex = R.curryN(2, function(q, r, s) { return new _Hex(q, r, s); });
+const Hex = R.curryN(2, function(q, r, s) { return {q, r, s: R.defaultTo(-q, -r, s)}; });
 
 const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
                              Math.max(Math.abs(aq - bq),
@@ -55,7 +55,7 @@ const hexCorner = R.curry(function({x, y}, i) {
           y: y + s * Math.sin(angleRad)};
 });
 
-const corners = hex => R.range(0, 6).map(hexCorner(hex.toPoint()));
+const corners = hex => R.range(0, 6).map(hexCorner(toPoint(hex)));
 
 const directions = [
   Hex(+1, -1, 0), Hex(+1, 0, -1), Hex(0, +1, -1),
