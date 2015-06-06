@@ -2,6 +2,7 @@ import R from 'ramda';
 import {extend, applyToThis} from './util';
 
 const Rx = global.Rx;
+import synchronize from './sync';
 
 import draw from './canvas-draw';
 import {Hex} from './hex';

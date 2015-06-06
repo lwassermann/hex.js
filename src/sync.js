@@ -1,28 +1,35 @@
 import DiffSync from 'diffsync';
 import Socket from 'socket.io-client';
 
-// if installed from standalone script or browserify / webpack
-const DiffSyncClient = DiffSync.Client;
+const Rx = global.Rx;
 
-// pass the connection and the id of the data you want to synchronize
-const client = new DiffSyncClient(Socket(), 1);
+function synchronize(id) {
+  const client = new DiffSync.Client(Socket(), id);
+  global.client = client;
 
-let data;
+  client.initialize();
 
-client.on('connected', function() {
-  // the initial data has been loaded,
-  // you can initialize your application
-  data = client.getData();
-  global.data = data;
-});
+  return {
+    stream: Rx.Observable.create(function(observer) {
+      // pass the connection and the id of the data you want to synchronize
 
-client.on('synced', function() {
-  // an update from the server has been applied
-  // you can perform the updates in your application now
-});
+      client.on('connected', function() {
+        observer.onNext(client.getData());
+      });
 
-client.initialize();
-global.client = client;
+      client.on('synced', function() {
+        observer.onNext(client.getData());
+      });
 
-export default client;
-export {data};
+      return function() {
+        client.scheduled = true;
+        client.socket.close();
+      };
+    }).publish().refCount(),
+    sync: () => client.sync(),
+    client: client
+  };
+}
+
+export default synchronize;
+export {};
