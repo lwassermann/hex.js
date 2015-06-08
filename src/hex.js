@@ -11,7 +11,7 @@ class _Hex {
   }
 }
 
-const Hex = R.curryN(2, function(q, r, s) { return {q, r, s: R.defaultTo(-q, -r, s)}; });
+const Hex = R.curryN(2, function(q, r, s) { return {q, r, s: R.defaultTo(-q - r, s)}; });
 
 const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
                              Math.max(Math.abs(aq - bq),
