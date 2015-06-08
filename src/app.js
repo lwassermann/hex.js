@@ -20,8 +20,9 @@ function updateSize(fn, canvas) {
   const HDDPIPixelFactor = window && window.devicePixelRatio || 1;
 
   function resize() {
-    const width = canvas.clientWidth * HDDPIPixelFactor;
-    const height = canvas.clientHeight * HDDPIPixelFactor;
+    // unfortunately we have to use the window height, because css respects the aspect ratio
+    const width = window.innerWidth * HDDPIPixelFactor;
+    const height = window.innerHeight * HDDPIPixelFactor;
 
     canvas.width = width;
     canvas.height = height;
