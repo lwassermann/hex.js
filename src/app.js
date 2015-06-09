@@ -128,9 +128,10 @@ const sync = function(app) {
 function render(app, canvas) {
   updateSize(app.redraw.bind(app), canvas);
 
-  Rx.Observable.fromEvent(canvas, 'pointermove')
-    .map(relativePtFromEvt)
-    .subscribe(handlePointerMove(app));
+  const pointermove = Rx.Observable.fromEvent(canvas, 'pointermove')
+    .map(relativePtFromEvt);
+  pointermove.subscribe(handlePointerMove(app));
+  pointermove.subscribe(sync(app));
 
   const pointerdown = Rx.Observable.fromEvent(canvas, 'pointerdown')
     .map(relativeHexFromEvt);
