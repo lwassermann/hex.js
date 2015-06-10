@@ -11,7 +11,7 @@ class _Hex {
   }
 }
 
-const Hex = R.curryN(2, function(q, r, s) { return new _Hex(q, r, s); });
+const Hex = R.curryN(2, function(q, r, s) { return {q, r, s: R.defaultTo(-q - r, s)}; });
 
 const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
                              Math.max(Math.abs(aq - bq),
@@ -22,9 +22,11 @@ const add = R.curry((a, b) => Hex(a.q + b.q, a.r + b.r));
 const sub = R.curry((a, b) => Hex(a.q - b.q, a.r - b.r));
 const scale = R.curry((a, k) => Hex(a.q * k, a.r * k));
 
+/* eslint-disable no-dupe-args */
 const equals = R.curry(function({q: q1, r: r1, s: s1}, {q: q2, r: r2, s: s2}) {
   return q1 === q2 && r1 === r2 && s1 === s2;
 });
+/* eslint-enable no-dupe-args */
 
 const round = R.curry(function(h) {
   // rX means rounded X, short for glanceability (otherwise the rounded dominates the word)
@@ -53,7 +55,7 @@ const hexCorner = R.curry(function({x, y}, i) {
           y: y + s * Math.sin(angleRad)};
 });
 
-const corners = hex => R.range(0, 6).map(hexCorner(hex.toPoint()));
+const corners = hex => R.range(0, 6).map(hexCorner(toPoint(hex)));
 
 const directions = [
   Hex(+1, -1, 0), Hex(+1, 0, -1), Hex(0, +1, -1),

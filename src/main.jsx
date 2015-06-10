@@ -16,3 +16,4 @@ R.pipe(
        createCanvas,
        R.map(app)
        )('content');
+
