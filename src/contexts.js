@@ -6,12 +6,10 @@ Nothing.map = R.always(Nothing);
 const Maybe = function(c) {
   if (R.isNil(c)) { return Nothing; }
 
-  const newMaybe = Object.create(MaybeProto);
-  newMaybe.value = c;
-  return newMaybe;
+  return Object.create(Just, {value: c});
 };
 
-const MaybeProto = {
+const Just = {
   map: R.curry(function(fn) {
     return Maybe(fn(this.value));
   })
