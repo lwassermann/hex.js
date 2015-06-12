@@ -6,6 +6,7 @@ import synchronize from './sync';
 
 import draw from './canvas-draw';
 import {Hex} from './hex';
+import {Maybe} from './contexts';
 
 // --------------------------------------------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ class _App {
   constructor(canvas) {
     this.context = canvas.getContext('2d');
     this.scene = [];
+    this.hover = Maybe(null);
     this.objects = [
       {hex: Hex(3, 3), colors: {background: 'red'}, id: 1},
       {hex: Hex(3, 4), colors: {background: 'green'}, id: 2},
@@ -61,6 +63,7 @@ const App = function(canvas) {
 function redraw(app) {
   draw.flush(app.context);
   app.scene.map(draw.defaultHex(app.context));
+  R.map(draw.hex(app.context, {background: 'rgba(128, 128, 128, 0.2)'}), app.hover);
   app.objects.map(spec => draw.hex(app.context, spec.colors, spec.hex));
 }
 
@@ -85,6 +88,8 @@ const handlePointerMove = R.curry(function(app, pt) {
     app.moves.hex = Hex.fromPoint(pt);
     app.redraw();
   }
+
+  app.hover = Maybe(Hex.round(Hex.fromPoint(pt)));
 });
 const handlePointerDown = R.curry(function(app, hex) {
   let targetObject = R.findLast(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
