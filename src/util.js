@@ -27,4 +27,4 @@ const applyToThis = fn => R.curryN(fn.length - 1, function() {
   return fn.call(this, this, ...arguments);
 });
 
-export {extend, applyToThis};
+export { extend, applyToThis };

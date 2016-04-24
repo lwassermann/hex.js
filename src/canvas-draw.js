@@ -13,39 +13,40 @@ const setProp = R.curry(function(name, value, obj) {
 const fillStyle = setProp('fillStyle');
 const strokeStyle = setProp('strokeStyle');
 
-const drawPoint = R.curry(function(context, {x, y}) {
+const drawPoint = R.curry(function(context, point) {
+  const { x, y } = point;
   context.arc(x * pixelFactor, y * pixelFactor, 2 * pixelFactor, 0, 2 * Math.PI);
   context.fill();
 
-  return arguments[1];
+  return point;
 });
 
 const hexPath = function(context, hex) {
   const vertices = Hex.corners(hex);
   context.moveTo(vertices[5].x * pixelFactor, vertices[5].y * pixelFactor);
-  vertices.map(({x, y}) => context.lineTo(x * pixelFactor, y * pixelFactor));
+  vertices.map(({ x, y }) => context.lineTo(x * pixelFactor, y * pixelFactor));
 
-  return arguments[1];
+  return hex;
 };
 
 const drawHexFill = R.curry(function(context, hex) {
   hexPath(context, hex);
   context.fill();
 
-  return arguments[1];
+  return hex;
 });
 
 const drawHexOutline = R.curry(function(context, hex) {
   hexPath(context, hex);
   context.stroke();
 
-  return arguments[1];
+  return hex;
 });
 
 const drawHexCenter = R.curry(function(context, hex) {
   drawPoint(context, hex.toPoint());
 
-  return arguments[1];
+  return hex;
 });
 
 const drawHex = R.curry(function(context, options, hex) {
@@ -82,7 +83,7 @@ const flush = function flush(context) {
 
 export default {
   hex: drawHex,
-  defaultHex: drawHex(R.__, {background: '#efefef', outline: '#333333'}),
+  defaultHex: drawHex(R.__, { background: '#efefef', outline: '#333333' }),
   hexCenter: drawHexCenter,
   fillHex: drawHexFill,
   outlineHex: drawHexOutline,
@@ -91,4 +92,4 @@ export default {
 
   point: drawPoint,
 };
-export {drawPoint, drawHexCenter, drawHex, drawHexOutline, flush};
+export { drawPoint, drawHexCenter, drawHex, drawHexOutline, flush };

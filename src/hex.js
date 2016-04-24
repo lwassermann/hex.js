@@ -1,7 +1,7 @@
 'use strict';
 
 import R from 'ramda';
-import {extend, applyToThis} from './util';
+import { extend, applyToThis } from './util';
 
 class _Hex {
   constructor(q, r, s) {
@@ -11,9 +11,9 @@ class _Hex {
   }
 }
 
-const Hex = R.curryN(2, function(q, r, s) { return {q, r, s: R.defaultTo(-q - r, s)}; });
+const Hex = R.curryN(2, function(q, r, s) { return { q, r, s: R.defaultTo(-q - r, s) }; });
 
-const gridDistance = R.curry(({q: aq, r: ar, s: az}, {q: bq, r: br, s: bs}) =>
+const gridDistance = R.curry(({ q: aq, r: ar, s: az }, { q: bq, r: br, s: bs }) =>
                              Math.max(Math.abs(aq - bq),
                                       Math.abs(ar - br),
                                       Math.abs(az - bs)));
@@ -23,7 +23,7 @@ const sub = R.curry((a, b) => Hex(a.q - b.q, a.r - b.r));
 const scale = R.curry((a, k) => Hex(a.q * k, a.r * k));
 
 /* eslint-disable no-dupe-args */
-const equals = R.curry(function({q: q1, r: r1, s: s1}, {q: q2, r: r2, s: s2}) {
+const equals = R.curry(function({ q: q1, r: r1, s: s1 }, { q: q2, r: r2, s: s2 }) {
   return q1 === q2 && r1 === r2 && s1 === s2;
 });
 /* eslint-enable no-dupe-args */
@@ -47,12 +47,12 @@ const round = R.curry(function(h) {
   return Hex(rQ, rR, -rQ - rR);
 });
 
-const hexCorner = R.curry(function({x, y}, i) {
+const hexCorner = R.curry(function({ x, y }, i) {
   const angleDeg = 60 * i + 30;
   const angleRad = Math.PI / 180 * angleDeg;
   const s = Hex.size - Hex.spacing / 2;
-  return {x: x + s * Math.cos(angleRad),
-          y: y + s * Math.sin(angleRad)};
+  return { x: x + s * Math.cos(angleRad),
+          y: y + s * Math.sin(angleRad) };
 });
 
 const corners = hex => R.range(0, 6).map(hexCorner(toPoint(hex)));
@@ -63,7 +63,7 @@ const directions = [
 ];
 
 const line = (a, b) => {
-  const {q: dq, r: dr} = sub(b, a);
+  const { q: dq, r: dr } = sub(b, a);
   const N = gridDistance(a, b);
   const dN = 1.0 / N;
   return R.map(i => Hex(a.q + dq * dN * i,
@@ -72,7 +72,7 @@ const line = (a, b) => {
 };
 
 // pointy top variant
-const fromPoint = R.curry(function({x, y}) {
+const fromPoint = R.curry(function({ x, y }) {
   const q = (x * Math.sqrt(3) / 3 - y / 3) / Hex.size;
   const r = y * 2 / 3 / Hex.size;
   return Hex(q, r);
@@ -81,7 +81,7 @@ const fromPoint = R.curry(function({x, y}) {
 const toPoint = R.curry(function(hex) {
   const x = Hex.size * Math.sqrt(3) * (hex.q + hex.r / 2);
   const y = Hex.size * 3 / 2 * hex.r;
-  return {x, y};
+  return { x, y };
 });
 
 const h = {
@@ -102,8 +102,8 @@ const h = {
   toPoint,
 };
 
-extend(Hex, h, {fromPoint, size: 20, spacing: 2});
+extend(Hex, h, { fromPoint, size: 20, spacing: 2 });
 extend(_Hex.prototype, R.map(applyToThis, h));
 
 export default Hex;
-export {Hex};
+export { Hex };

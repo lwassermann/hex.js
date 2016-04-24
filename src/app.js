@@ -1,18 +1,19 @@
 import R from 'ramda';
-import {extend, applyToThis} from './util';
+import { extend, applyToThis } from './util';
 
 const Rx = global.Rx;
 import synchronize from './sync';
 
 import draw from './canvas-draw';
-import {Hex} from './hex';
-import {Maybe} from './contexts';
+import { Hex } from './hex';
+import { Maybe } from './contexts';
+import { Pawn } from './pawns';
 
-// --------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 const relativePtFromEvt = function(e) {
-  return {x: (window.scrollX + e.clientX),
-          y: (window.scrollY + e.clientY)};
+  return { x: (window.scrollX + e.clientX),
+          y: (window.scrollY + e.clientY) };
 };
 
 const relativeHexFromEvt = R.compose(Hex.round, Hex.fromPoint, relativePtFromEvt);
@@ -35,7 +36,7 @@ function updateSize(fn, canvas) {
   resize();
 }
 
-// --------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 class _App {
   constructor(canvas) {
@@ -54,7 +55,7 @@ class _App {
   }
 }
 
-// --------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 const App = function(canvas) {
   return new _App(canvas);
@@ -92,7 +93,7 @@ const handlePointerMove = R.curry(function(app, pt) {
   app.hover = Maybe(Hex.round(Hex.fromPoint(pt)));
 });
 const handlePointerDown = R.curry(function(app, hex) {
-  let targetObject = R.findLast(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
+  const targetObject = R.findLast(R.compose(Hex.equals(hex), R.prop('hex')), app.objects);
   if (targetObject) {
     app.moves = targetObject;
     targetObject.from = hex;
@@ -151,16 +152,16 @@ function render(app, canvas) {
   return canvas;
 }
 
-// --------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 const behaviour = {
   render,
   targetHex,
   redraw,
-  toggleHex,
+  toggleHex
 };
 extend(App, behaviour);
 extend(_App.prototype, R.map(applyToThis, behaviour));
 
 export default App;
-export {render};
+export { render };

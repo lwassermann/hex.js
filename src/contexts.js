@@ -22,17 +22,17 @@ const Either = function(e) {
 };
 
 const Left = function(v) {
-  return Object.create(Left, { value: { value: v } });
+  return Object.create(Left.prototype, { value: { value: v } });
 };
 Left.prototype = {
   map: function() { return this; }
 };
 const Right = function(v) {
-  return Object.create(Right, { value: { value: v } });
+  return Object.create(Right.prototype, { value: { value: v } });
 };
 Right.prototype = {
   map: function(f) { return Either(f(this.value)); }
 };
 
 export default {};
-export {Maybe, Either};
+export { Maybe, Either };
