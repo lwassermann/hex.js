@@ -103,7 +103,7 @@ const h = {
 };
 
 extend(Hex, h, {fromPoint, size: 20, spacing: 2});
-extend(_Hex.prototype, R.mapObj(applyToThis, h));
+extend(_Hex.prototype, R.map(applyToThis, h));
 
 export default Hex;
 export {Hex};

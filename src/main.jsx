@@ -1,7 +1,7 @@
 'use strict';
 import R from 'ramda';
 
-import {Maybe} from './contexts';
+import { Maybe } from './contexts';
 import app from './app';
 
 function createCanvas(selector) {

@@ -160,7 +160,7 @@ const behaviour = {
   toggleHex,
 };
 extend(App, behaviour);
-extend(_App.prototype, R.mapObj(applyToThis, behaviour));
+extend(_App.prototype, R.map(applyToThis, behaviour));
 
 export default App;
 export {render};

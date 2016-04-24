@@ -6,7 +6,7 @@ Nothing.map = R.always(Nothing);
 const Maybe = function(c) {
   if (R.isNil(c)) { return Nothing; }
 
-  return Object.create(Just, {value: c});
+  return Object.create(Just, { value: { value: c } });
 };
 
 const Just = {
@@ -22,13 +22,13 @@ const Either = function(e) {
 };
 
 const Left = function(v) {
-  return Object.create(Left, {value: v});
+  return Object.create(Left, { value: { value: v } });
 };
 Left.prototype = {
   map: function() { return this; }
 };
 const Right = function(v) {
-  return Object.create(Right, {value: v});
+  return Object.create(Right, { value: { value: v } });
 };
 Right.prototype = {
   map: function(f) { return Either(f(this.value)); }

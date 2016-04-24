@@ -32,4 +32,3 @@ function synchronize(id) {
 }
 
 export default synchronize;
-export {};
