@@ -43,10 +43,7 @@ class _App {
     this.context = canvas.getContext('2d');
     this.scene = [];
     this.hover = Maybe(null);
-    this.objects = [
-      {hex: Hex(3, 3), colors: {background: 'red'}, id: 1},
-      {hex: Hex(3, 4), colors: {background: 'green'}, id: 2},
-      {hex: Hex(2, 5), colors: {background: 'blue'}, id: 3}];
+    this.objects = [Pawn({ color: 'red' }), Pawn({ color: 'green' }), Pawn({ color: 'blue' })];
 
     this.render(canvas);
 
@@ -64,8 +61,8 @@ const App = function(canvas) {
 function redraw(app) {
   draw.flush(app.context);
   app.scene.map(draw.defaultHex(app.context));
-  R.map(draw.hex(app.context, {background: 'rgba(128, 128, 128, 0.2)'}), app.hover);
-  app.objects.map(spec => draw.hex(app.context, spec.colors, spec.hex));
+  R.map(draw.hex(app.context, { background: 'rgba(128, 128, 128, 0.2)' }), app.hover);
+  app.objects.map(item => draw.render(app.context, item));
 }
 
 const targetHex = R.curry(function(app, hex) {

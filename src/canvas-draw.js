@@ -81,6 +81,15 @@ const flush = function flush(context) {
   return tapFlush(tapFlush);
 };
 
+// rendering of items
+const knownRenderers = {};
+const registerRenderer = function(type, fn) {
+  knownRenderers[type] = fn;
+};
+const render = R.curry(function(context, item) {
+  return knownRenderers[item.type](context, item);
+});
+
 export default {
   hex: drawHex,
   defaultHex: drawHex(R.__, { background: '#efefef', outline: '#333333' }),
@@ -91,5 +100,8 @@ export default {
   flush,
 
   point: drawPoint,
+
+  registerRenderer,
+  render
 };
 export { drawPoint, drawHexCenter, drawHex, drawHexOutline, flush };
